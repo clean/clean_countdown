@@ -1,0 +1,17 @@
+name: clean_countdown
+description: An iOS style countdown timer. Inspired by the native timer app on iOS.
+version: 0.0.1
+repository: https://github.com/clean/clean_countdown
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
