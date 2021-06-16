@@ -96,7 +96,7 @@ class CleanCountdown extends StatefulWidget {
   final Color ringColor;
   final bool showRing;
   final double ringStroke;
-  final double startStopOnTap;
+  final bool startStopOnTap;
 
   @override
   State<StatefulWidget> createState() {
