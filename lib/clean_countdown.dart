@@ -6,14 +6,35 @@ import 'src/timer_painter.dart';
 
 class CleanCountdownController {
   AnimationController controller;
+  bool isCounting = false;
+
   final Function onCompleted;
+
   CleanCountdownController({
     this.onCompleted,
   });
 
-  void start() => controller.forward();
-  void stop() => controller.stop();
-  void reset() => controller.reset();
+  void start() {
+    if (controller is AnimationController) {
+      controller.forward();
+      isCounting = true;
+    }
+  }
+
+  void stop() {
+    if (controller is AnimationController) {
+      controller.stop();
+      isCounting = false;
+    }
+  }
+
+  void reset() {
+    if (controller is AnimationController) {
+      controller.reset();
+    }
+  }
+
+  void setNewDuration(Duration duration) => controller.duration = duration;
 }
 
 class CleanCountdown extends StatefulWidget {
@@ -47,6 +68,9 @@ class CleanCountdown extends StatefulWidget {
     // Color for timer circle, default is green.
     this.ringColor = Colors.green,
 
+    // Display timer circle, default is true.
+    this.showRing = true,
+
     // Width of the timer circle.
     this.ringStroke = 6.0,
   }) : super(key: key);
@@ -67,7 +91,7 @@ class CleanCountdown extends StatefulWidget {
   final TextStyle timeStyle;
 
   final Color ringColor;
-
+  final bool showRing;
   final double ringStroke;
 
   @override
@@ -79,46 +103,48 @@ class CleanCountdown extends StatefulWidget {
 class _CleanCountdownState extends State<CleanCountdown>
     with SingleTickerProviderStateMixin {
   AnimationController animationController;
-  CleanCountdownController _controller;
-
-  bool running = false;
+  CleanCountdownController _countdownController;
 
   @override
   void initState() {
     animationController = AnimationController(vsync: this);
-    _controller = widget.controller;
-    _controller.controller = animationController;
+    _countdownController = widget.controller;
+    _countdownController.controller = animationController;
     animationController.duration = widget.duration;
     animationController.addListener(_animationValueListener);
     animationController.addStatusListener(_animationStatusListener);
     if (widget.startOnInit) {
-      animationController.forward();
-      running = true;
+      _countdownController.start();
     }
     super.initState();
   }
 
   @override
+  void dispose() {
+    animationController.stop();
+    animationController.removeStatusListener(_animationStatusListener);
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        if (!running) {
-          animationController.forward();
-          running = true;
-        } else if (running) {
-          animationController.stop();
-          running = false;
-        }
-      },
-      child: Container(
+        onTap: () {
+          if (!_countdownController.isCounting) {
+            _countdownController.start();
+          } else {
+            _countdownController.stop();
+          }
+        },
+        child: Container(
           width: widget.size,
           height: widget.size,
-          child: AspectRatio(
-            aspectRatio: 1.0,
-            child: Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                // circle
+          child: Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              // circle
+              if (widget.showRing)
                 AnimatedBuilder(
                   animation: animationController,
                   builder: (context, _) {
@@ -131,40 +157,39 @@ class _CleanCountdownState extends State<CleanCountdown>
                     );
                   },
                 ),
-                // countdown text
-                Container(
-                  height: widget.size / 3,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: AnimatedBuilder(
-                        animation: animationController,
-                        builder: (context, child) {
-                          return Text(getText(),
-                              style: TextStyle(
-                                fontSize: MediaQuery.of(context).size.width,
-                                fontFeatures: [FontFeature.tabularFigures()],
-                              ).merge(widget.timeStyle));
-                        }),
+              // countdown text
+              Container(
+                height: widget.size / 3,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: AnimatedBuilder(
+                      animation: animationController,
+                      builder: (context, child) {
+                        return Text(getText(),
+                            style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ).merge(widget.timeStyle));
+                      }),
+                ),
+              ),
+              if (widget.header is Widget)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child:
+                      Container(height: widget.size / 3, child: widget.header),
+                ),
+              if (widget.footer is Widget)
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: widget.size / 3,
+                    child: widget.footer,
                   ),
                 ),
-                if (widget.header is Widget)
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                        height: widget.size / 3, child: widget.header),
-                  ),
-                if (widget.footer is Widget)
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      height: widget.size / 3,
-                      child: widget.footer,
-                    ),
-                  ),
-              ],
-            ),
-          )),
-    );
+            ],
+          ),
+        ));
   }
 
   @override
@@ -182,14 +207,15 @@ class _CleanCountdownState extends State<CleanCountdown>
   void _animationStatusListener(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.forward:
-        running = true;
+        _countdownController.isCounting = true;
         break;
       case AnimationStatus.dismissed:
-        running = false;
+        _countdownController.isCounting = false;
         break;
       case AnimationStatus.completed:
-        running = false;
-        if (_controller.onCompleted is Function) _controller.onCompleted();
+        _countdownController.isCounting = false;
+        if (_countdownController.onCompleted is Function)
+          _countdownController.onCompleted();
         break;
       default:
     }
@@ -207,13 +233,5 @@ class _CleanCountdownState extends State<CleanCountdown>
     } else {
       return "${duration.inMinutes.toString().padLeft(2, "0")}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
     }
-  }
-
-  @override
-  void dispose() {
-    animationController.stop();
-    animationController.removeStatusListener(_animationStatusListener);
-    animationController.dispose();
-    super.dispose();
   }
 }

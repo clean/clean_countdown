@@ -15,6 +15,7 @@ class DemoApp extends StatefulWidget {
 class _DemoAppState extends State<DemoApp> {
   CleanCountdownController controller;
   bool completed = false;
+  Color ringColor = Colors.green;
 
   @override
   void initState() {
@@ -36,9 +37,18 @@ class _DemoAppState extends State<DemoApp> {
             children: <Widget>[
               Container(
                 child: CleanCountdown(
-                  size: 300,
-                  header: Center(child: Text('Header')),
-                  footer: Center(child: Text('Footer')),
+                  size: 200,
+                  showRing: false,
+                  ringColor: ringColor,
+                  header: Center(
+                    child: Text(
+                      'Header',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  footer: Center(
+                    child: Text('Footer'),
+                  ),
                   controller: controller,
                   duration: Duration(seconds: 3),
                 ),
@@ -74,6 +84,18 @@ class _DemoAppState extends State<DemoApp> {
                     child: Text('reset'),
                   ),
                 ],
+              ),
+              FlatButton(
+                color: Colors.grey,
+                onPressed: () {
+                  setState(() {
+                    controller.controller.duration = Duration(minutes: 20);
+                    ringColor = Colors.amber;
+                    controller.reset();
+                    controller.start();
+                  });
+                },
+                child: Text('set new duration'),
               ),
               Divider(),
               (completed)
