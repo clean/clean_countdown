@@ -56,6 +56,9 @@ class CleanCountdown extends StatefulWidget {
     // Whether or not the widget should start countdown after appearing.
     this.startOnInit = false,
 
+    // Whether or not the widget should stop onTap
+    this.startStopOnTap = true,
+
     // Custom style of time string.
     this.timeStyle,
 
@@ -93,6 +96,7 @@ class CleanCountdown extends StatefulWidget {
   final Color ringColor;
   final bool showRing;
   final double ringStroke;
+  final double startStopOnTap;
 
   @override
   State<StatefulWidget> createState() {
@@ -131,10 +135,12 @@ class _CleanCountdownState extends State<CleanCountdown>
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          if (!_countdownController.isCounting) {
-            _countdownController.start();
-          } else {
-            _countdownController.stop();
+          if (widget.startStopOnTap) {
+            if (!_countdownController.isCounting) {
+              _countdownController.start();
+            } else {
+              _countdownController.stop();
+            }
           }
         },
         child: Container(
