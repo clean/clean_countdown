@@ -20,6 +20,9 @@ class _DemoAppState extends State<DemoApp> {
   @override
   void initState() {
     controller = CleanCountdownController();
+    controller.addListener(() {
+      print(controller.isCounting);
+    });
     super.initState();
   }
 

@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'src/timer_painter.dart';
 
-class CleanCountdownController {
+class CleanCountdownController extends ChangeNotifier {
   AnimationController controller;
   bool isCounting = false;
 
@@ -18,6 +18,7 @@ class CleanCountdownController {
     if (controller is AnimationController) {
       controller.forward();
       isCounting = true;
+      notifyListeners();
     }
   }
 
@@ -25,12 +26,14 @@ class CleanCountdownController {
     if (controller is AnimationController) {
       controller.stop();
       isCounting = false;
+      notifyListeners();
     }
   }
 
   void reset() {
     if (controller is AnimationController) {
       controller.reset();
+      notifyListeners();
     }
   }
 
