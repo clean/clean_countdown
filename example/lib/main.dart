@@ -21,7 +21,9 @@ class _DemoAppState extends State<DemoApp> {
   void initState() {
     controller = CleanCountdownController();
     controller.addListener(() {
-      print(controller.isCounting);
+      setState(() {
+        print(controller.isCounting);
+      });
     });
     super.initState();
   }
@@ -43,6 +45,7 @@ class _DemoAppState extends State<DemoApp> {
                   size: 200,
                   showRing: false,
                   ringColor: ringColor,
+                  startOnInit: true,
                   header: Center(
                     child: Text(
                       'Header',

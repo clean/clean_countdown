@@ -121,7 +121,8 @@ class _CleanCountdownState extends State<CleanCountdown>
     animationController.addListener(_animationValueListener);
     animationController.addStatusListener(_animationStatusListener);
     if (widget.startOnInit) {
-      _countdownController.start();
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _countdownController.start());
     }
     super.initState();
   }
