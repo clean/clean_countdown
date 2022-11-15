@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'src/timer_painter.dart';
 
 class CleanCountdownController extends ChangeNotifier {
-  AnimationController controller;
+  AnimationController? controller;
   bool isCounting = false;
 
-  final Function onCompleted;
+  final Function? onCompleted;
 
   CleanCountdownController({
     this.onCompleted,
@@ -16,7 +16,7 @@ class CleanCountdownController extends ChangeNotifier {
 
   void start() {
     if (controller is AnimationController) {
-      controller.forward();
+      controller!.forward();
       isCounting = true;
       notifyListeners();
     }
@@ -24,7 +24,7 @@ class CleanCountdownController extends ChangeNotifier {
 
   void stop() {
     if (controller is AnimationController) {
-      controller.stop();
+      controller!.stop();
       isCounting = false;
       notifyListeners();
     }
@@ -32,26 +32,26 @@ class CleanCountdownController extends ChangeNotifier {
 
   void reset() {
     if (controller is AnimationController) {
-      controller.reset();
+      controller!.reset();
       notifyListeners();
     }
   }
 
-  void setNewDuration(Duration duration) => controller.duration = duration;
+  void setNewDuration(Duration duration) => controller!.duration = duration;
 }
 
 class CleanCountdown extends StatefulWidget {
   CleanCountdown({
-    Key key,
+    Key? key,
 
     // The controller
-    @required this.controller,
+    required this.controller,
 
     // The duration of time the widget should countdown from.
-    @required this.duration,
+    required this.duration,
 
     // The size of the widget
-    @required this.size,
+    required this.size,
 
     // Function listener for current value.
     this.valueListener,
@@ -87,14 +87,14 @@ class CleanCountdown extends StatefulWidget {
 
   final CleanCountdownController controller;
 
-  final void Function(Duration timeElapsed) valueListener;
+  final void Function(Duration timeElapsed)? valueListener;
 
   final bool startOnInit;
 
-  final Widget header;
-  final Widget footer;
+  final Widget? header;
+  final Widget? footer;
 
-  final TextStyle timeStyle;
+  final TextStyle? timeStyle;
 
   final Color ringColor;
   final bool showRing;
@@ -109,19 +109,19 @@ class CleanCountdown extends StatefulWidget {
 
 class _CleanCountdownState extends State<CleanCountdown>
     with SingleTickerProviderStateMixin {
-  AnimationController animationController;
-  CleanCountdownController _countdownController;
+  AnimationController? animationController;
+  late CleanCountdownController _countdownController;
 
   @override
   void initState() {
     animationController = AnimationController(vsync: this);
     _countdownController = widget.controller;
     _countdownController.controller = animationController;
-    animationController.duration = widget.duration;
-    animationController.addListener(_animationValueListener);
-    animationController.addStatusListener(_animationStatusListener);
+    animationController!.duration = widget.duration;
+    animationController!.addListener(_animationValueListener);
+    animationController!.addStatusListener(_animationStatusListener);
     if (widget.startOnInit) {
-      WidgetsBinding.instance
+      WidgetsBinding.instance!
           .addPostFrameCallback((_) => _countdownController.start());
     }
     super.initState();
@@ -129,9 +129,9 @@ class _CleanCountdownState extends State<CleanCountdown>
 
   @override
   void dispose() {
-    animationController.stop();
-    animationController.removeStatusListener(_animationStatusListener);
-    animationController.dispose();
+    animationController!.stop();
+    animationController!.removeStatusListener(_animationStatusListener);
+    animationController!.dispose();
     super.dispose();
   }
 
@@ -156,7 +156,7 @@ class _CleanCountdownState extends State<CleanCountdown>
               // circle
               if (widget.showRing)
                 AnimatedBuilder(
-                  animation: animationController,
+                  animation: animationController!,
                   builder: (context, _) {
                     return CustomPaint(
                       size: MediaQuery.of(context).size,
@@ -173,7 +173,7 @@ class _CleanCountdownState extends State<CleanCountdown>
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: AnimatedBuilder(
-                      animation: animationController,
+                      animation: animationController!,
                       builder: (context, child) {
                         return Text(getText(),
                             style: TextStyle(
@@ -209,8 +209,8 @@ class _CleanCountdownState extends State<CleanCountdown>
 
   void _animationValueListener() {
     if (widget.valueListener != null) {
-      widget.valueListener(
-          animationController.duration * animationController.value);
+      widget.valueListener!(
+          animationController!.duration! * animationController!.value);
     }
   }
 
@@ -225,7 +225,7 @@ class _CleanCountdownState extends State<CleanCountdown>
       case AnimationStatus.completed:
         _countdownController.isCounting = false;
         if (_countdownController.onCompleted is Function)
-          _countdownController.onCompleted();
+          _countdownController.onCompleted!();
         break;
       default:
     }
@@ -233,10 +233,10 @@ class _CleanCountdownState extends State<CleanCountdown>
 
   String getText() {
     Duration duration =
-        animationController.duration * animationController.value;
+        animationController!.duration! * animationController!.value;
 
     duration = Duration(
-        seconds: animationController.duration.inSeconds - duration.inSeconds);
+        seconds: animationController!.duration!.inSeconds - duration.inSeconds);
 
     if (duration.inHours > 0) {
       return "${duration.inHours}:${(duration.inMinutes % 60).toString().padLeft(2, "0")}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
