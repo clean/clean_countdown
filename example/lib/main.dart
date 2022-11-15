@@ -13,9 +13,13 @@ class DemoApp extends StatefulWidget {
 }
 
 class _DemoAppState extends State<DemoApp> {
-  CleanCountdownController controller;
+  late CleanCountdownController controller;
   bool completed = false;
   Color ringColor = Colors.green;
+  var buttonStyles = ButtonStyle(
+    foregroundColor: MaterialStateProperty.all(Colors.white),
+    backgroundColor: MaterialStateProperty.all(Colors.grey),
+  );
 
   @override
   void initState() {
@@ -43,7 +47,7 @@ class _DemoAppState extends State<DemoApp> {
               Container(
                 child: CleanCountdown(
                   size: 200,
-                  showRing: false,
+                  showRing: true,
                   ringColor: ringColor,
                   startOnInit: true,
                   header: Center(
@@ -63,24 +67,24 @@ class _DemoAppState extends State<DemoApp> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FlatButton(
-                    color: Colors.grey,
+                  TextButton(
+                    style: buttonStyles,
                     onPressed: () {
                       controller.start();
                     },
                     child: Text('start'),
                   ),
                   SizedBox(width: 10),
-                  FlatButton(
-                    color: Colors.grey,
+                  TextButton(
+                    style: buttonStyles,
                     onPressed: () {
                       controller.stop();
                     },
                     child: Text('stop'),
                   ),
                   SizedBox(width: 10),
-                  FlatButton(
-                    color: Colors.grey,
+                  TextButton(
+                    style: buttonStyles,
                     onPressed: () {
                       setState(() {
                         completed = false;
@@ -91,11 +95,11 @@ class _DemoAppState extends State<DemoApp> {
                   ),
                 ],
               ),
-              FlatButton(
-                color: Colors.grey,
+              TextButton(
+                style: buttonStyles,
                 onPressed: () {
                   setState(() {
-                    controller.controller.duration = Duration(minutes: 20);
+                    controller.controller!.duration = Duration(minutes: 20);
                     ringColor = Colors.amber;
                     controller.reset();
                     controller.start();
