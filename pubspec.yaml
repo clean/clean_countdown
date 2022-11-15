@@ -1,6 +1,6 @@
 name: clean_countdown
 description: An iOS style countdown timer. Inspired by the native timer app on iOS.
-version: 0.0.2
+version: 1.0.0
 repository: https://github.com/clean/clean_countdown
 
 environment:
